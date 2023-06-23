@@ -9,7 +9,7 @@ function App() {
 
   const manageArrival = (i) => {
     const carNumber = prompt('Car Number :')
-    const timeArrival = prompt('Arrival Time (HH:MM:SS):')
+    const timeArrival = prompt('Arrival Time (HH:MM):')
     const getSlots = [...slots]
     getSlots[i] = {
       carNumber,
@@ -23,10 +23,8 @@ function App() {
   const manageDepart = (i) => {
     const car = slots[i]
     const timeDepart = prompt('Depart time :')
-  
-
   const totalTime = countTotalTime(car.timeArrival, timeDepart)
-  const amountToBePaid = countAmountToBePaid(totalTime)
+  const amountToBePaid = countAmountToBePaid(countTotalTime)
   const getSlots = [...slots]
   getSlots[i] = null
   setSlots(getSlots)
@@ -37,7 +35,16 @@ function App() {
   }
 
   const countTotalTime = (timeArrival, timeDepart) => {
-    const time = new Date
+    const timeArr = timeArrival.split(":")
+    const timeDept = timeDepart.split(":")
+    const timeNow = new Date(2000, 0, 1, timeDept[0], timeDept[1])
+    const timeAtArrival = new Date(2000, 0, 1, timeArr[0], timeArr[1])
+    console.log(timeNow);
+    console.log(timeAtArrival);
+    console.log(new Date(timeNow - timeAtArrival).getHours());
+    return(
+      timeNow - timeAtArrival
+      )
   }
 
   const countAmountToBePaid = (totalTime) => {
@@ -49,7 +56,7 @@ function App() {
       return 100
     } else if (totalTime >= 6 && totalTime <= 8) {
       return 200
-    } else {
+    } else if(totalTime > 8) {
       alert("You cann't park car for more than 8 hours")
     }
   }
@@ -63,7 +70,7 @@ function App() {
               {slots.map((slot, i) => (
                 <tr>
                   <td className={`slot ${slot ? 'booked' : ""}`} onClick={() => (slot ? manageDepart(i) : manageArrival(i))}>
-                    {slot ? slot.carNumber : '1'}
+                    {slot ? `${1} ${slot.carNumber}\n ${slot.timeArrival}` : '1'}
                   </td>
                 </tr>
               ))}
