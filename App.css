@@ -11,3 +11,8 @@ td{
 thead {
   background-color: aqua;
 }
+
+.booked{
+  background-color: green
+  ;
+}
