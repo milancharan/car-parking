@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import Data from "./assets/Data.json"
+import { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
   const [slots, setSlots] = useState(Array(20).fill())
   const [booked, setBooked] = useState(0)
   const [blank, setBlank] = useState(20)
+  const [totalTime, setTotalTime] = useState('')
+  const [amountToBePaid, setAmountToBePaid] = useState(0)
 
   const manageArrival = (i) => {
     const carNumber = prompt('Car Number :')
@@ -16,72 +17,99 @@ function App() {
       timeArrival
     }
     setSlots(getSlots)
-    setBooked(booked+1)
-    setBlank(blank-1)
+    setBooked(booked + 1)
+    setBlank(blank - 1)
   }
 
   const manageDepart = (i) => {
     const car = slots[i]
     const timeDepart = prompt('Depart time :')
-  const totalTime = countTotalTime(car.timeArrival, timeDepart)
-  const amountToBePaid = countAmountToBePaid(countTotalTime)
-  const getSlots = [...slots]
-  getSlots[i] = null
-  setSlots(getSlots)
-  setBooked(booked-1)
-  setBlank(blank+1)
-
-  alert(`Amount to Pay: ${amountToBePaid}`)
+    countTotalTime(car.timeArrival, timeDepart)
+    const getSlots = [...slots]
+    getSlots[i] = null
+    setSlots(getSlots)
+    setBooked(booked - 1)
+    setBlank(blank + 1)
+    
   }
 
   const countTotalTime = (timeArrival, timeDepart) => {
-    const timeArr = timeArrival.split(":")
-    const timeDept = timeDepart.split(":")
-    const timeNow = new Date(2000, 0, 1, timeDept[0], timeDept[1])
-    const timeAtArrival = new Date(2000, 0, 1, timeArr[0], timeArr[1])
-    console.log(timeNow);
-    console.log(timeAtArrival);
-    console.log(new Date(timeNow - timeAtArrival).getHours());
-    return(
-      timeNow - timeAtArrival
-      )
+    function removeColon(t) {
+      if (t)
+        t = t.replace(":", "");
+
+      return parseInt(t);
+    }
+    function diff(t1, t2) {
+      let time1 = removeColon(t1);
+
+      let time2 = removeColon(t2);
+      let hourDiff = parseInt(time2 / 100 - time1 / 100 - 1);
+      let minDiff = parseInt(time2 % 100 + (60 - time1 % 100));
+      if (minDiff >= 60) {
+        hourDiff++;
+        minDiff = minDiff - 60;
+      }
+      let res = (hourDiff).toString() + ':' + (minDiff < 9 && minDiff > 0 ? '0' + (minDiff).toString() : (minDiff === 0 ? '00' : (minDiff).toString()));
+      return res;
+    }
+
+    setTotalTime(diff(timeArrival, timeDepart));
   }
 
-  const countAmountToBePaid = (totalTime) => {
-    if(totalTime <= 1){
-      return 20
-    } else if(totalTime >= 2 && totalTime <= 4){
-      return 40
-    } else if(totalTime >= 4 && totalTime <= 6) {
-      return 100
-    } else if (totalTime >= 6 && totalTime <= 8) {
-      return 200
-    } else if(totalTime > 8) {
+  useEffect(() => {
+    const t1 = totalTime.split(':')
+    var countTime = 0
+  
+    if(t1[0] == 0){
+      if(t1[1] == 0){
+        countTime = 0
+      } else {
+        countTime = 0  
+      }
+    } else{
+      if(t1[1]!=0){
+        countTime = parseInt(t1[0]) + 1
+      } else {
+        countTime = parseInt(t1[0])
+      }
+    }
+  
+    if(countTime === 0) {
+      setAmountToBePaid(0)
+    }else if (countTime>0 && countTime <= 1 ) {
+      setAmountToBePaid(20)
+    } else if (countTime >= 2 && countTime <= 4) {
+      setAmountToBePaid(40)
+    } else if (countTime >= 4 && countTime <= 6) {
+      setAmountToBePaid(100)
+    } else if (countTime >= 6 && countTime <= 8) {
+      setAmountToBePaid(200)
+    } else if(countTime < 1 && countTime>=0) {
+      setAmountToBePaid(0)
+    } else{
+      setAmountToBePaid(500)
       alert("You cann't park car for more than 8 hours")
     }
-  }
 
+  },[totalTime])
 
 
   return (
-    <div className="App">
-      <table>
-        <tbody>
-              {slots.map((slot, i) => (
-                <tr>
-                  <td className={`slot ${slot ? 'booked' : ""}`} onClick={() => (slot ? manageDepart(i) : manageArrival(i))}>
-                    {slot ? `${1} ${slot.carNumber}\n ${slot.timeArrival}` : '1'}
-                  </td>
-                </tr>
-              ))}
-        </tbody>
-      </table>
-      <div>
-                <p>Booked Slots: {booked}</p>
-                <p>Blank Slots: {blank}</p>
-                <p>Total Time: {countTotalTime}</p>
-                <p>Amount To Pay: {countAmountToBePaid}</p>
-            </div>
+    <div className="App"> 
+      <div className='row gap-2 border border-secondary p-5 mx-auto w-75'>
+          {slots.map((slot, i) => (
+              <div className={`slot col-2  border p-auto ${slot ? 'booked' : ""}`} onClick={() => (slot ? manageDepart(i) : manageArrival(i))}>
+                {slot ? `${i+1} (${slot.carNumber})\n ${slot.timeArrival}` : i+1}
+              </div>
+          ))}
+      </div>
+      <div className='container border w-25 border-dark mt-2'>
+        <p>Booked Slots: {booked}</p>
+        <p>Blank Slots: {blank}</p>
+        <p>Total Time: {totalTime}</p>
+        <p>Amount To Pay: {amountToBePaid}</p>
+      </div>
     </div>
   );
 }
