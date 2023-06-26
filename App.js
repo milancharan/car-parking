@@ -15,10 +15,10 @@ function App() {
     const regex = new RegExp("^[A-Z]{2}[-][0-9]{1,2}[-][A-Z]{1,2}[-][0-9]{3,4}$")
     const regexTime = new RegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")
 
-    if(carNumber == ('' || null) || timeArrival == ('' || null)){
+    if (carNumber == ('' || null) || timeArrival == ('' || null)) {
       return alert('Please fill data...!')
-    } else if(regex.test(carNumber)) {
-      if(regexTime.test(timeArrival)){
+    } else if (regex.test(carNumber)) {
+      if (regexTime.test(timeArrival)) {
         getSlots[i] = {
           carNumber,
           timeArrival
@@ -29,7 +29,7 @@ function App() {
       } else {
         alert('Invalid time format...! Recommended: HH:MM')
       }
-    } else if(!regex.test(carNumber) && !(carNumber == '')) {
+    } else if (!regex.test(carNumber) && !(carNumber == '')) {
       alert('Please enter Registration Number in valid format...!')
     } else {
       alert('Please enter valid data...!')
@@ -56,11 +56,18 @@ function App() {
     const car = slots[i]
     const timeDepart = prompt('Depart time :')
     const regexTime = new RegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")
-    if(regexTime.test(timeDepart)){
+    if (regexTime.test(timeDepart)) {
       const timess = countTotalTime(car.timeArrival, timeDepart)
-      if(parseInt(timess) === 0){
+      const today1h = new Date().setHours(car.timeArrival.split(":")[0])
+      const today2h = new Date().setHours(timeDepart.split(":")[0])
+      console.log(today1h);
+      console.log(today2h);
+      // console.log(timess[0]+ timess[1]);
+      // const today1m = new Date().setMinutes(car.timeArrival.split(":")[1])
+      // const today2m = new Date().setMinutes(car.timeDepart.split(":")[1])
+      if ((parseInt(timess[0]) === 0)) {
         alert('Please enter valid Departure time...!')
-      } else if(parseInt(timess) > 8){
+      } else if (parseInt(timess) > 8) {
         alert("You cann't park for more than 8 hours...!")
         const getSlots = [...slots]
         getSlots[i] = null
@@ -77,30 +84,49 @@ function App() {
         console.log("action done");
       }
     } else {
-      alert("Invalid time format...! Recommended: HH:MM")
+      alert("Invalid time format...!")
     }
   }
 
   const countTotalTime = (timeArrival, timeDepart) => {
-    function removeColon(t) {
-      if (t)
-        t = t.replace(":", "");
+    // function removeColon(t) {
+    //   if (t)
+    //     t = t.replace(":", "");
 
-      return parseInt(t);
-    }
+    //   return parseInt(t);
+    // }
     function diff(t1, t2) {
-      let time1 = removeColon(t1);
-      let time2 = removeColon(t2);
-      let hourDiff = parseInt(time2 / 100 - time1 / 100 - 1);
-      let minDiff = parseInt(time2 % 100 + (60 - time1 % 100));
-      if (minDiff >= 60) {
-        hourDiff++;
-        minDiff = minDiff - 60;
-      }
+      // let time1 = removeColon(t1);
+      // let time2 = removeColon(t2);
+      // let hourDiff = parseInt(time2 / 100 - time1 / 100 - 1);
+      // let minDiff = parseInt(time2 % 100 + (60 - time1 % 100));
+      // if (minDiff >= 60) {
+      //   hourDiff++;
+      //   minDiff = minDiff - 60;
+      // }
+      var [h1, m1] = t1.split(":")
+      var [h2, m2] = t2.split(":")
+
+      h1 = parseInt(h1)
+      m1 = parseInt(m1)
+      h2 = parseInt(h2)
+      m2 = parseInt(m2)
+
+      var totalM1 = h1 * 60 + m1
+      var totalM2 = h2 * 60 + m2
+
+      var diffM = totalM2 - totalM1
+
+      var hourDiff = Math.floor(diffM / 60)
+      var minDiff = diffM % 60
+      console.log(hourDiff);
+      console.log(minDiff);
       let res = (hourDiff).toString() + ':' + (minDiff < 9 && minDiff > 0 ? '0' + (minDiff).toString() : (minDiff === 0 ? '00' : (minDiff).toString()));
-      const resSplit = parseInt(res.split(':')[0])
+      // console.log(res);
+      // const resSplit = parseInt(res.split(':')[0])
       // console.log(resSplit);
-      return ((resSplit <0) ? '00:00' : res);
+      // const fres = res.split(":")
+      return ((hourDiff < 0) ? '00:00' : res);
     }
     setTotalTime(diff(timeArrival, timeDepart))
     return diff(timeArrival, timeDepart)
@@ -116,7 +142,7 @@ function App() {
       if (t1[1] == 0) {
         countTime = 0
       } else {
-        countTime = 0
+        countTime = 1
       }
     } else {
       if (t1[1] != 0) {
@@ -130,14 +156,12 @@ function App() {
       setAmountToBePaid(0)
     } else if (countTime > 0 && countTime <= 1) {
       setAmountToBePaid(20)
-    } else if (countTime >= 2 && countTime <= 4) {
+    } else if (countTime > 1 && countTime <= 4) {
       setAmountToBePaid(40)
     } else if (countTime >= 4 && countTime <= 6) {
       setAmountToBePaid(100)
     } else if (countTime >= 6 && countTime <= 8) {
       setAmountToBePaid(200)
-    } else if (countTime < 1 && countTime >= 0) {
-      setAmountToBePaid(0)
     } else {
       setAmountToBePaid(2000)
       alert("You are liable to pay fine of Rs. 2000/-")
