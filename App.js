@@ -9,15 +9,20 @@ function App() {
   const [amountToBePaid, setAmountToBePaid] = useState(0)
 
   const manageArrival = (i) => {
-    const carNumber = prompt('Car Number: XX-00-XX-0000')
-    const timeArrival = prompt('Arrival Time: HH:MM:')
-    const getSlots = [...slots]
     const regex = new RegExp("^[A-Z]{2}[-][0-9]{1,2}[-][A-Z]{1,2}[-][0-9]{3,4}$")
     const regexTime = new RegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")
-
-    if (carNumber == ('' || null) || timeArrival == ('' || null)) {
-      return alert('Please fill data...!')
-    } else if (regex.test(carNumber)) {
+    const carNumber = prompt('Car Number: XX-00-XX-0000')
+    // console.log(typeof(carNumber));
+    if (carNumber == ('' || null)) {
+      return 0
+    }
+    const timeArrival = prompt("Arrival Time: HH:MM,\nNote : Mandatory to use 24 hours time format")
+    // console.log(typeof(timeArrival));
+    if (timeArrival == ('' || null)) {
+      return 0
+    }
+    const getSlots = [...slots]
+    if (regex.test(carNumber)) {
       if (regexTime.test(timeArrival)) {
         getSlots[i] = {
           carNumber,
